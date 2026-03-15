@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Italy</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --sky-t:#015fa3;--sky-b:#56c0ea;
+  --green-d:#1a5c2a;--green-m:#2e8b47;--green-l:#44a85f;
+  --gold:#f9a825;--gold2:#e65100;
+  --red:#e53935;--black:#1a1a1a;--white:#fffef8;
+  --ta:#64b5f6;--tb:#ef9a9a;
+  --ff:'Fredoka One',cursive;--fn:'Nunito',sans-serif;
+}
+html,body{
+  width:100%;height:100%;
+  overflow:hidden;
+  background:linear-gradient(180deg,var(--sky-t) 0%,var(--sky-b) 100%);
+  font-family:var(--fn);color:#fff;
+  touch-action:manipulation;user-select:none;
+  -webkit-text-size-adjust:none;
+}
+
+/* ═══════════════════════════════════
+   SCREENS
+═══════════════════════════════════ */
+.screen{display:none;position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;
+  align-items:center;justify-content:center;flex-direction:column}
+.screen.active{display:flex}
+
+/* ═══════════════════════════════════
+   LOBBY
+═══════════════════════════════════ */
+#screen-lobby{
+  background:linear-gradient(180deg,#01579b 0%,#0288d1 45%,#4fc3f7 100%)}
+.lobby-inner{width:100%;max-width:400px;padding:1.5rem 1.2rem;
+  display:flex;flex-direction:column;align-items:center;gap:1.1rem}
+.logo h1{font-family:var(--ff);font-size:clamp(3rem,13vw,5rem);
+  color:var(--gold);text-align:center;line-height:1;
+  text-shadow:0 3px 0 #b56e00,0 6px 18px rgba(0,0,0,.4)}
+.logo .suits{text-align:center;font-size:1.3rem;letter-spacing:.5em;
+  color:rgba(255,255,255,.7);margin-top:.2rem}
+.logo .sub{text-align:center;font-size:.78rem;letter-spacing:.15em;
+  text-transform:uppercase;color:rgba(255,255,255,.45);margin-top:.2rem;font-weight:700}
+.box{width:100%;background:rgba(0,0,0,.35);border:1.5px solid rgba(255,255,255,.18);
+  border-radius:18px;padding:1.4rem;display:flex;flex-direction:column;gap:.8rem;
+  backdrop-filter:blur(10px)}
+.box h2{font-family:var(--ff);font-size:1.3rem;color:var(--gold);text-align:center}
+.fg{display:flex;flex-direction:column;gap:.35rem}
+.fg label{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:rgba(255,255,255,.55);font-weight:800}
+.fg input{background:rgba(255,255,255,.13);border:2px solid rgba(255,255,255,.2);
+  border-radius:10px;padding:.65rem .9rem;color:#fff;font-family:var(--fn);
+  font-size:.95rem;font-weight:700;outline:none;width:100%;transition:border-color .2s}
+.fg input:focus{border-color:var(--gold)}
+.fg input::placeholder{color:rgba(255,255,255,.3)}
+.btn{font-family:var(--ff);font-size:1.05rem;padding:.65rem 1.2rem;width:100%;
+  border:none;border-radius:50px;cursor:pointer;
+  box-shadow:0 4px 0 rgba(0,0,0,.3);transition:all .12s;outline:none}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.3)}
+.btn-gold{background:linear-gradient(135deg,#fdd835,#f57f17);color:#4e2a04}
+.btn-blue{background:linear-gradient(135deg,#42a5f5,#1565c0);color:#fff}
+.btn-green{background:linear-gradient(135deg,#66bb6a,#2e7d32);color:#fff}
+.btn-purple{background:linear-gradient(135deg,#ce93d8,#7b1fa2);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-sm{font-family:var(--ff);font-size:.75rem;padding:.3rem .75rem;
+  border:none;border-radius:50px;cursor:pointer;background:rgba(255,255,255,.2);
+  color:#fff;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.err{color:#ffcdd2;font-size:.85rem;text-align:center;min-height:1rem;font-weight:700}
+
+/* ═══════════════════════════════════
+   WAITING ROOM
+═══════════════════════════════════ */
+#screen-waiting{background:linear-gradient(180deg,#01579b,#0288d1 60%,#4fc3f7)}
+.wait-inner{width:100%;max-width:480px;padding:1.5rem 1.2rem;
+  display:flex;flex-direction:column;align-items:center;gap:1rem}
+.wait-inner h2{font-family:var(--ff);font-size:1.8rem;color:var(--gold);
+  text-shadow:0 2px 8px rgba(0,0,0,.4)}
+.code-box{width:100%;background:rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.2);
+  border-radius:14px;padding:.9rem 1.2rem;text-align:center}
+.code-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.2em;opacity:.5;font-weight:700}
+.code-val{font-family:var(--ff);font-size:2.2rem;color:var(--gold);letter-spacing:.3em}
+.copy-btn{margin-top:.3rem;font-size:.75rem;padding:.22rem .65rem;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;color:#fff;cursor:pointer}
+
+/* Seat grid */
+.seats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;width:100%}
+.seat-tile{background:rgba(0,0,0,.28);border:2px solid rgba(255,255,255,.15);
+  border-radius:12px;padding:.7rem .8rem;display:flex;align-items:center;gap:.6rem;
+  cursor:pointer;transition:all .15s}
+.seat-tile:hover:not(.me){border-color:rgba(249,168,37,.6);background:rgba(249,168,37,.1)}
+.seat-tile.me{border-color:var(--gold);background:rgba(249,168,37,.12);cursor:default}
+.seat-tile.full{border-color:rgba(255,255,255,.25)}
+.s-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-family:var(--ff);font-size:1.1rem;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.25)}
+.s-av.A{background:linear-gradient(135deg,#1e88e5,#0d47a1)}
+.s-av.B{background:linear-gradient(135deg,#e53935,#b71c1c)}
+.s-av.empty{background:rgba(255,255,255,.08);color:rgba(255,255,255,.3);font-size:.9rem}
+.s-info{flex:1;min-width:0}
+.s-num{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;opacity:.5;font-weight:700}
+.s-name{font-size:.88rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.s-badge{font-size:.62rem;font-weight:800;padding:.12rem .38rem;border-radius:8px;flex-shrink:0}
+.s-badge.A{background:rgba(21,101,192,.45);color:#90caf9}
+.s-badge.B{background:rgba(198,40,40,.45);color:#ef9a9a}
+.swap-tip{font-size:.72rem;color:rgba(255,255,255,.4);font-style:italic}
+.wait-note{font-size:.88rem;color:rgba(255,255,255,.5);font-weight:700}
+.settings-box{width:100%;background:rgba(0,0,0,.28);border:2px solid rgba(255,255,255,.15);
+  border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:.8rem}
+.settings-box h3{font-family:var(--ff);font-size:1rem;color:var(--gold);text-align:center}
+.t-row{display:flex;gap:.6rem}
+.t-btn{flex:1;padding:.5rem;border:2px solid rgba(255,255,255,.2);border-radius:10px;
+  background:rgba(255,255,255,.08);color:#fff;font-family:var(--fn);font-size:.9rem;
+  font-weight:800;cursor:pointer;transition:all .12s}
+.t-btn.sel{border-color:var(--gold);background:rgba(249,168,37,.15);color:var(--gold)}
+
+/* ═══════════════════════════════════
+   GAME SCREEN — GRID LAYOUT
+═══════════════════════════════════ */
+#screen-game{
+  background:linear-gradient(180deg,#01579b 0%,#0288d1 30%,#4fc3f7 100%);
+  flex-direction:column;overflow:hidden;padding:0}
+
+/* HUD */
+.hud{
+  flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
+  padding:.3rem .7rem;background:rgba(0,0,0,.4);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  min-height:42px;z-index:50}
+.hs{display:flex;flex-direction:column;align-items:center;min-width:85px}
+.hs .hl{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;opacity:.6;font-weight:700}
+.hs .hv{font-family:var(--ff);font-size:1.35rem;line-height:1}
+.hs.a .hv{color:var(--ta)}.hs.b .hv{color:var(--tb)}
+.hc{display:flex;flex-direction:column;align-items:center;gap:1px}
+.hc .hr{font-family:var(--ff);font-size:.9rem;color:var(--gold)}
+.hc .ht{font-size:.6rem;opacity:.45;font-weight:700}
+
+/* Game area: 3-row grid */
+.game-area{
+  flex:1;min-height:0;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  grid-template-columns:auto 1fr auto;
+  grid-template-areas:
+    ". top ."
+    "left center right"
+    ". bottom .";
+  padding:3px;gap:2px;
+  overflow:hidden}
+
+/* ── Player pods ── */
+.ppod{display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px}
+.ppod-top   {grid-area:top}
+.ppod-left  {grid-area:left;flex-direction:row;align-items:center;gap:4px}
+.ppod-right {grid-area:right;flex-direction:row-reverse;align-items:center;gap:4px}
+.ppod-bottom{grid-area:bottom;flex-direction:column-reverse;align-items:center;width:100%}
+
+/* Avatar */
+.av{width:46px;height:46px;border-radius:50%;padding:3px;flex-shrink:0;position:relative;
+  box-shadow:0 0 0 2px #fff,0 3px 10px rgba(0,0,0,.5)}
+.av.A{background:linear-gradient(135deg,#42a5f5,#0d47a1);box-shadow:0 0 0 2px #fff,0 0 10px rgba(66,165,245,.5),0 3px 10px rgba(0,0,0,.5)}
+.av.B{background:linear-gradient(135deg,#ef5350,#b71c1c);box-shadow:0 0 0 2px #fff,0 0 10px rgba(239,83,80,.5),0 3px 10px rgba(0,0,0,.5)}
+.av.active{animation:avPulse .9s ease-in-out infinite}
+@keyframes avPulse{
+  0%,100%{box-shadow:0 0 0 2px #fff,0 0 12px rgba(249,168,37,.5),0 3px 10px rgba(0,0,0,.5)}
+  50%{box-shadow:0 0 0 3px var(--gold),0 0 22px rgba(249,168,37,.9),0 3px 10px rgba(0,0,0,.5),0 0 0 7px rgba(249,168,37,.15)}}
+.av-inner{width:100%;height:100%;border-radius:50%;background:rgba(0,0,0,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--ff);font-size:1.3rem;color:#fff;border:1.5px solid rgba(255,255,255,.2)}
+.av.sm{width:38px;height:38px}
+.av.sm .av-inner{font-size:1.1rem}
+/* Dealer dot */
+.dealer-dot{position:absolute;top:-3px;right:-3px;width:16px;height:16px;
+  border-radius:50%;background:var(--gold);border:1.5px solid #fff;
+  display:none;align-items:center;justify-content:center;font-size:.6rem;
+  box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.dealer-dot.on{display:flex}
+
+/* Name chip */
+.nchip{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);
+  border-radius:20px;padding:.15rem .6rem;text-align:center;
+  max-width:100px;overflow:hidden}
+.nc-name{font-size:.72rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nc-team{font-size:.55rem;font-weight:700}
+.nc-team.A{color:var(--ta)}.nc-team.B{color:var(--tb)}
+.nc-tr{font-size:.52rem;color:rgba(255,255,255,.45);font-weight:700}
+
+/* Opponent card fans */
+.fan{display:flex;align-items:center}
+.cb{width:22px;height:32px;background:linear-gradient(135deg,#1a237e,#3949ab);
+  border:1.5px solid rgba(255,255,255,.25);border-radius:3px;
+  box-shadow:1px 1px 4px rgba(0,0,0,.5);flex-shrink:0}
+.fan .cb:not(:first-child){margin-left:-15px}
+.ppod-left .fan,.ppod-right .fan{flex-direction:column}
+.ppod-left .fan .cb:not(:first-child),
+.ppod-right .fan .cb:not(:first-child){margin-left:0;margin-top:-24px}
+
+/* ── CENTER ZONE ── */
+.center-zone{
+  grid-area:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;min-width:0;min-height:0;overflow:hidden;padding:2px}
+
+/* Table felt circle */
+.table-wrap{display:flex;align-items:center;justify-content:center;gap:6px;
+  flex-shrink:0}
+.table{
+  /* Reliable sizing using aspect-ratio */
+  width:clamp(150px,42vmin,260px);
+  height:clamp(150px,42vmin,260px);
+  border-radius:50%;
+  flex-shrink:0;
+  background:
+    radial-gradient(ellipse at 30% 28%,rgba(255,255,255,.15) 0%,transparent 45%),
+    radial-gradient(ellipse at center,#44a85f 0%,#2e8b47 45%,#1a5c2a 75%,#0d3d06 100%);
+  border:clamp(5px,1.5vmin,10px) solid #5c3209;
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,.4),
+    inset 3px 3px 15px rgba(255,255,255,.1),
+    0 8px 30px rgba(0,0,0,.6),
+    0 0 0 clamp(3px,0.8vmin,5px) #3a1f05;
+  position:relative;overflow:hidden}
+/* Table pattern lines */
+.table::before{content:'';position:absolute;inset:0;border-radius:50%;
+  background:
+    repeating-linear-gradient(0deg,transparent,transparent 22px,rgba(255,255,255,.04) 22px,rgba(255,255,255,.04) 23px),
+    repeating-linear-gradient(90deg,transparent,transparent 22px,rgba(255,255,255,.04) 22px,rgba(255,255,255,.04) 23px)}
+
+/* Trick slots */
+.trick-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.slots{position:relative;width:68%;height:68%}
+.ts{position:absolute;display:flex;align-items:center;justify-content:center}
+.ts.t{top:0;left:50%;transform:translateX(-50%)}
+.ts.b{bottom:0;left:50%;transform:translateX(-50%)}
+.ts.l{left:0;top:50%;transform:translateY(-50%)}
+.ts.r{right:0;top:50%;transform:translateY(-50%)}
+
+/* Trump side panel */
+.trump-panel{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.18);
+  border-radius:12px;padding:6px 8px;flex-shrink:0;
+  box-shadow:0 3px 12px rgba(0,0,0,.5)}
+.tp-lbl{font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;
+  color:rgba(255,255,255,.55);font-weight:700}
+.tp-suit{font-size:.68rem;font-weight:800;min-height:.85rem;text-align:center}
+#tp-slot{display:flex;align-items:center;justify-content:center}
+
+/* Status & tally */
+.status{font-size:.75rem;font-weight:700;text-align:center;color:#fff;
+  max-width:240px;line-height:1.3;padding:2px 6px;
+  text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.tally{display:flex;gap:.7rem;font-size:.7rem;font-weight:800}
+.ta-t{color:var(--ta)}.tb-t{color:var(--tb)}.sep{opacity:.35}
+
+/* My hand */
+.my-hand{
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:2px 4px 0;overflow:visible;min-height:90px;position:relative}
+.my-hand .mc:not(:first-child){margin-left:-26px}
+
+/* ═══════════════════════════════════
+   CARDS
+═══════════════════════════════════ */
+.card{
+  width:54px;height:77px;
+  background:var(--white);border:1px solid rgba(0,0,0,.12);border-radius:7px;
+  box-shadow:0 2px 7px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.5);
+  position:relative;display:flex;align-items:center;justify-content:center;
+  font-family:var(--ff);flex-shrink:0}
+.card.r{color:var(--red)}.card.k{color:var(--black)}
+.cr{position:absolute;top:3px;left:4px;font-size:.76rem;line-height:1}
+.cs-t{position:absolute;top:13px;left:4px;font-size:.58rem;line-height:1}
+.cs-c{font-size:1.4rem;line-height:1}
+.crb{position:absolute;bottom:3px;right:4px;font-size:.76rem;line-height:1;transform:rotate(180deg)}
+.cs-b{position:absolute;bottom:13px;right:4px;font-size:.58rem;line-height:1;transform:rotate(180deg)}
+
+.card.back{background:linear-gradient(135deg,#1a237e,#3949ab);
+  border:1.5px solid rgba(255,255,255,.2);color:transparent}
+.card.back::after{content:'🂠';font-size:2.4rem;color:rgba(255,255,255,.18)}
+.card.back.sm{width:38px;height:53px}
+.card.back.sm::after{font-size:1.7rem}
+
+/* Trick cards */
+.tc{width:46px;height:65px}
+.tc.in{animation:dropIn .25s ease-out}
+@keyframes dropIn{from{transform:scale(.5) translateY(-15px);opacity:0}to{transform:none;opacity:1}}
+
+/* My cards */
+.mc{width:62px;height:88px;cursor:pointer;
+  transition:transform .15s,box-shadow .15s,filter .15s;z-index:1}
+.mc:not(.inv):hover{transform:translateY(-22px);z-index:20;box-shadow:0 10px 24px rgba(0,0,0,.6)}
+.mc.inv{filter:brightness(.42) saturate(.2);cursor:not-allowed}
+.mc.vh{box-shadow:0 0 0 2.5px var(--gold),0 3px 14px rgba(249,168,37,.5)}
+.mc.dealing{animation:dealIn .28s ease-out both}
+@keyframes dealIn{from{transform:translateY(-40px) scale(.5);opacity:0}to{transform:none;opacity:1}}
+.card.dragging{opacity:.4}
+
+/* Trump panel card */
+.tcard{width:38px;height:53px}
+
+/* ═══════════════════════════════════
+   ACTION BUTTONS
+═══════════════════════════════════ */
+.game-btns{
+  position:fixed;bottom:98px;right:8px;z-index:60;
+  display:flex;flex-direction:column;gap:7px;align-items:flex-end}
+.btn-trump{
+  background:linear-gradient(135deg,#ce93d8,#7b1fa2);color:#fff;
+  border:none;border-radius:50px;font-family:var(--ff);font-size:.85rem;
+  padding:.5rem 1rem;cursor:pointer;display:none;align-items:center;gap:5px;
+  box-shadow:0 3px 0 rgba(0,0,0,.3),0 0 15px rgba(171,71,188,.5);
+  animation:tglow 1.5s infinite}
+.btn-trump.show{display:flex}
+@keyframes tglow{0%,100%{box-shadow:0 3px 0 rgba(0,0,0,.3),0 0 15px rgba(171,71,188,.5)}
+  50%{box-shadow:0 3px 0 rgba(0,0,0,.3),0 0 30px rgba(171,71,188,.95)}}
+.game-ctrl{position:fixed;top:50px;right:6px;z-index:60;display:flex;gap:5px}
+
+/* Fullscreen button */
+.btn-fs{font-family:var(--ff);font-size:.72rem;padding:.28rem .65rem;
+  border:none;border-radius:50px;cursor:pointer;background:rgba(255,255,255,.2);
+  color:#fff;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+
+/* ═══════════════════════════════════
+   OVERLAYS
+═══════════════════════════════════ */
+.ov{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);
+  display:none;align-items:flex-start;justify-content:center;
+  padding-top:48px;backdrop-filter:blur(4px);overflow-y:auto}
+.ov.open{display:flex}
+#ov-bid{padding-top:46px}
+
+.panel{background:linear-gradient(165deg,rgba(13,71,161,.97),rgba(1,42,90,.99));
+  border:2px solid rgba(255,255,255,.2);border-radius:20px;padding:1.4rem;
+  width:92%;max-width:400px;display:flex;flex-direction:column;gap:.9rem;
+  box-shadow:0 20px 60px rgba(0,0,0,.7);animation:pIn .2s ease-out;
+  max-height:calc(100dvh - 56px);overflow-y:auto}
+@keyframes pIn{from{transform:scale(.88) translateY(15px);opacity:0}to{transform:none;opacity:1}}
+.panel h2{font-family:var(--ff);color:var(--gold);font-size:1.35rem;text-align:center}
+.panel p{color:rgba(255,255,255,.7);font-size:.88rem;text-align:center}
+
+/* Bid */
+.bid-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem}
+.bn{padding:.8rem .5rem;font-family:var(--ff);font-size:1.7rem;
+  border:2px solid rgba(249,168,37,.3);border-radius:12px;
+  background:rgba(249,168,37,.07);color:var(--gold);
+  cursor:pointer;transition:all .12s;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.bn:hover:not(:disabled){background:rgba(249,168,37,.18);border-color:var(--gold);transform:translateY(-2px)}
+.bn:active{transform:translateY(1px)}
+.bn:disabled{opacity:.25;cursor:not-allowed}
+.bn-nil{grid-column:1/-1;padding:.55rem;font-family:var(--ff);font-size:.9rem;
+  border:2px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.65);cursor:pointer;transition:all .12s}
+.bn-nil:hover:not(:disabled){background:rgba(255,255,255,.12)}
+.bn-nil:disabled{opacity:.25;cursor:not-allowed}
+
+/* Hand preview */
+.hprev{background:rgba(0,0,0,.28);border-radius:10px;padding:7px 5px 4px}
+.hp-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;
+  color:rgba(255,255,255,.4);text-align:center;margin-bottom:4px;font-weight:700}
+.hp-cards{display:flex;align-items:flex-end;justify-content:center;
+  flex-wrap:wrap;gap:4px;min-height:50px}
+.hp-cards .card{width:40px;height:57px;pointer-events:none}
+.hp-cards .cs-c{font-size:1rem}
+.hp-cards .cr,.hp-cards .crb{font-size:.65rem}
+.hp-cards .cs-t,.hp-cards .cs-b{font-size:.52rem}
+
+/* Bid log */
+.blog{max-height:68px;overflow-y:auto;background:rgba(0,0,0,.22);
+  border-radius:8px;padding:.4rem .65rem;font-size:.75rem;
+  display:flex;flex-direction:column;gap:2px}
+.be{opacity:.8}
+.bv{color:var(--gold);font-weight:800}
+
+/* Power card */
+.pwr-hand{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+  max-height:200px;overflow-y:auto;padding:4px}
+.pwr-hand .mc{width:54px;height:77px;margin-left:0!important}
+.pwr-hand .mc:hover{transform:translateY(-13px)}
+
+/* Round end */
+.rmsg{background:rgba(0,0,0,.25);border-radius:9px;padding:.65rem .9rem;
+  font-size:.88rem;font-weight:700;text-align:center;border-left:3px solid var(--gold)}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
+.stile{background:rgba(0,0,0,.22);border-radius:9px;padding:.65rem;text-align:center;
+  border:1px solid rgba(255,255,255,.1)}
+.sl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;opacity:.5;font-weight:700}
+.sv{font-family:var(--ff);font-size:1.35rem}
+.st{font-size:.75rem;opacity:.6;font-weight:700}
+.stile.a .sv{color:var(--ta)}.stile.b .sv{color:var(--tb)}
+.plus{color:#a5d6a7}.minus{color:#ef9a9a}
+.pvrev{display:flex;align-items:center;gap:.7rem;background:rgba(0,0,0,.2);
+  border-radius:9px;padding:.55rem .85rem;font-size:.82rem}
+.pvl{opacity:.5;font-weight:700}
+.rinfo{text-align:center;font-size:.77rem;opacity:.5;font-weight:700}
+
+/* ═══════════════════════════════════
+   GAME OVER
+═══════════════════════════════════ */
+#screen-gameover{background:linear-gradient(180deg,#01579b,#0288d1 50%,#4fc3f7)}
+.go-wrap{display:flex;flex-direction:column;align-items:center;gap:1.3rem;
+  padding:2rem 1.5rem;max-width:360px;width:100%;text-align:center}
+.go-wrap h1{font-family:var(--ff);font-size:clamp(2.2rem,9vw,3.5rem);color:var(--gold);
+  text-shadow:0 0 30px rgba(249,168,37,.5)}
+.win-ban{font-family:var(--ff);font-size:1.6rem;padding:.65rem 1.5rem;border-radius:50px}
+.win-ban.A{color:#90caf9;background:rgba(21,101,192,.3);border:2px solid rgba(66,165,245,.5)}
+.win-ban.B{color:#ef9a9a;background:rgba(198,40,40,.3);border:2px solid rgba(239,83,80,.5)}
+.go-sc{display:flex;gap:1rem;font-family:var(--ff);font-size:1.8rem}
+.g-a{color:var(--ta)}.g-b{color:var(--tb)}.g-vs{opacity:.35}
+
+/* ═══════════════════════════════════
+   DEALING OVERLAY
+═══════════════════════════════════ */
+#deal-ov{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:1rem;pointer-events:none}
+#deal-ov.show{display:flex}
+.do-title{font-family:var(--ff);font-size:1.6rem;color:var(--gold);text-align:center}
+.do-sub{font-size:.85rem;color:rgba(255,255,255,.5);text-align:center;font-weight:700}
+.do-row{display:flex;gap:5px}
+.do-c{width:36px;height:50px;background:linear-gradient(135deg,#1a237e,#3949ab);
+  border:1.5px solid rgba(255,255,255,.2);border-radius:5px;
+  animation:dcFly .35s ease-out both}
+@keyframes dcFly{from{transform:scale(0) translateY(-50px) rotate(-20deg);opacity:0}
+  to{transform:none;opacity:1}}
+
+/* ═══════════════════════════════════
+   TOASTS
+═══════════════════════════════════ */
+#toasts{position:fixed;top:52px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;gap:6px;z-index:999;pointer-events:none;
+  width:85%;max-width:300px}
+.toast{background:rgba(0,0,0,.88);border:1px solid rgba(255,255,255,.15);
+  border-radius:12px;padding:.45rem .85rem;font-size:.82rem;font-weight:700;
+  text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.5);
+  animation:tIn .2s ease-out,tOut .28s ease-in 2.5s forwards}
+@keyframes tIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0}}
+
+/* ═══════════════════════════════════
+   LANDSCAPE & RESPONSIVE
+═══════════════════════════════════ */
+/* Landscape: shorter tricks slots, wider table */
+@media (orientation:landscape) and (max-height:500px){
+  .hud{min-height:36px;padding:.15rem .7rem}
+  .hs .hv{font-size:1.1rem}
+  .table{width:clamp(120px,35vh,200px);height:clamp(120px,35vh,200px)}
+  .av{width:38px;height:38px}.av.sm{width:32px;height:32px}
+  .av-inner{font-size:1rem}.av.sm .av-inner{font-size:.9rem}
+  .nchip{max-width:80px}.nc-name{font-size:.65rem}
+  .mc{width:52px;height:74px}
+  .my-hand .mc:not(:first-child){margin-left:-22px}
+  .my-hand{min-height:78px}
+  .game-btns{bottom:82px}
+  .fan .cb{width:18px;height:27px}
+  .fan .cb:not(:first-child){margin-left:-12px}
+}
+
+/* Small portrait phones */
+@media (max-width:380px){
+  .mc{width:54px;height:77px}
+  .my-hand .mc:not(:first-child){margin-left:-22px}
+  .table{width:clamp(140px,38vmin,220px);height:clamp(140px,38vmin,220px)}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOBBY ══════════ -->
+<div id="screen-lobby" class="screen active">
+  <div class="lobby-inner">
+    <div class="logo">
+      <h1>Italy</h1>
+      <div class="suits">♠ ♥ ♦ ♣</div>
+      <p class="sub">4-Player Team Card Game</p>
+    </div>
+    <div class="box">
+      <h2>Create Room</h2>
+      <div class="fg">
+        <label>Your Name</label>
+        <input id="inp-name" type="text" placeholder="Enter your name…" maxlength="18" autocomplete="off">
+      </div>
+      <button class="btn btn-gold" onclick="onCreateRoom()">Create Room</button>
+    </div>
+    <div class="box">
+      <h2>Join Room</h2>
+      <div class="fg">
+        <label>Your Name</label>
+        <input id="inp-namej" type="text" placeholder="Enter your name…" maxlength="18" autocomplete="off">
+      </div>
+      <div class="fg">
+        <label>Room Code</label>
+        <input id="inp-code" type="text" placeholder="6-LETTER CODE" maxlength="6" autocomplete="off"
+               style="text-transform:uppercase;letter-spacing:.2em">
+      </div>
+      <button class="btn btn-blue" onclick="onJoinRoom()">Join Room</button>
+    </div>
+    <p class="err" id="lerr"></p>
+  </div>
+</div>
+
+<!-- ══════════ WAITING ROOM ══════════ -->
+<div id="screen-waiting" class="screen">
+  <div class="wait-inner">
+    <h2>Waiting Room</h2>
+    <div class="code-box">
+      <div class="code-lbl">Room Code</div>
+      <div class="code-val" id="disp-code">------</div>
+      <button class="copy-btn" onclick="copyCode()">📋 Copy</button>
+    </div>
+    <span style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;
+      color:rgba(255,255,255,.4);font-weight:700;align-self:flex-start">
+      Seats — tap to swap
+    </span>
+    <div class="seats-grid" id="seats-grid"></div>
+    <p class="swap-tip">Tap another seat to move or swap positions</p>
+    <p class="wait-note" id="wait-note">Waiting… (0/4)</p>
+    <div class="settings-box" id="sbox" style="display:none">
+      <h3>⚙ Match Settings</h3>
+      <div class="t-row">
+        <button class="t-btn sel" id="t30" onclick="selectTarget(30)">30 pts</button>
+        <button class="t-btn"    id="t50" onclick="selectTarget(50)">50 pts</button>
+      </div>
+      <button class="btn btn-green" id="start-btn" onclick="onStartGame()" disabled>
+        🃏 Start Game
+      </button>
+    </div>
+    <p class="err" id="werr"></p>
+  </div>
+</div>
+
+<!-- ══════════ GAME TABLE ══════════ -->
+<div id="screen-game" class="screen">
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hs a">
+      <span class="hl">Team A · P1+P3</span>
+      <span class="hv" id="sc-a">0</span>
+    </div>
+    <div class="hc">
+      <span class="hr" id="h-round">Round 1</span>
+      <span class="ht" id="h-target">Target: 30</span>
+    </div>
+    <div class="hs b">
+      <span class="hl">Team B · P2+P4</span>
+      <span class="hv" id="sc-b">0</span>
+    </div>
+  </div>
+
+  <!-- Game area grid -->
+  <div class="game-area">
+
+    <!-- TOP PLAYER -->
+    <div class="ppod ppod-top" id="ppod-top">
+      <div class="av A" id="av-top">
+        <div class="av-inner" id="av-top-l">?</div>
+        <div class="dealer-dot" id="dd-top">🃏</div>
+      </div>
+      <div class="fan" id="fan-top"></div>
+      <div class="nchip">
+        <div class="nc-name"  id="nm-top">—</div>
+        <div class="nc-team A" id="nt-top">—</div>
+        <div class="nc-tr"    id="ntr-top"></div>
+      </div>
+    </div>
+
+    <!-- LEFT PLAYER -->
+    <div class="ppod ppod-left" id="ppod-left">
+      <div class="av A" id="av-left">
+        <div class="av-inner" id="av-left-l">?</div>
+        <div class="dealer-dot" id="dd-left">🃏</div>
+      </div>
+      <div class="nchip">
+        <div class="nc-name"  id="nm-left">—</div>
+        <div class="nc-team A" id="nt-left">—</div>
+        <div class="nc-tr"    id="ntr-left"></div>
+      </div>
+      <div class="fan" id="fan-left"></div>
+    </div>
+
+    <!-- CENTER ZONE -->
+    <div class="center-zone">
+      <div class="table-wrap">
+        <!-- Felt table with trick slots -->
+        <div class="table" id="table">
+          <div class="trick-ring">
+            <div class="slots" id="slots">
+              <div class="ts t" id="ts-t" style="top:0;left:50%;transform:translateX(-50%)"></div>
+              <div class="ts b" id="ts-b" style="bottom:0;left:50%;transform:translateX(-50%)"></div>
+              <div class="ts l" id="ts-l" style="left:0;top:50%;transform:translateY(-50%)"></div>
+              <div class="ts r" id="ts-r" style="right:0;top:50%;transform:translateY(-50%)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trump indicator -->
+        <div class="trump-panel" id="trump-panel">
+          <div class="tp-lbl">TRUMP</div>
+          <div id="tp-slot"><div class="card back sm"></div></div>
+          <div class="tp-suit" id="tp-suit">Hidden</div>
+        </div>
+      </div>
+
+      <div class="tally">
+        <span class="ta-t">A:<b id="ta">0</b></span>
+        <span class="sep">|</span>
+        <span class="tb-t">B:<b id="tb">0</b></span>
+        <span class="sep" id="tn" style="color:rgba(255,255,255,.4)"></span>
+      </div>
+      <div class="status" id="status">Welcome!</div>
+    </div>
+
+    <!-- RIGHT PLAYER -->
+    <div class="ppod ppod-right" id="ppod-right">
+      <div class="av B" id="av-right">
+        <div class="av-inner" id="av-right-l">?</div>
+        <div class="dealer-dot" id="dd-right">🃏</div>
+      </div>
+      <div class="fan" id="fan-right"></div>
+      <div class="nchip">
+        <div class="nc-name"  id="nm-right">—</div>
+        <div class="nc-team B" id="nt-right">—</div>
+        <div class="nc-tr"    id="ntr-right"></div>
+      </div>
+    </div>
+
+    <!-- BOTTOM (ME) -->
+    <div class="ppod ppod-bottom" id="ppod-bottom">
+      <div class="my-hand" id="my-hand"></div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <div class="av A sm" id="av-me">
+          <div class="av-inner" id="av-me-l">?</div>
+          <div class="dealer-dot" id="dd-bottom">🃏</div>
+        </div>
+        <div class="nchip">
+          <div class="nc-name"  id="nm-bottom">You</div>
+          <div class="nc-team A" id="nt-bottom">—</div>
+          <div class="nc-tr"    id="ntr-bottom"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /game-area -->
+
+  <!-- Action buttons -->
+  <div class="game-btns">
+    <button class="btn-trump" id="btn-trump" onclick="onRevealTrump()">🔮 Reveal Trump</button>
+  </div>
+
+  <!-- Controls -->
+  <div class="game-ctrl">
+    <button class="btn-fs" onclick="toggleFullscreen()">⛶</button>
+    <button class="btn-sm" onclick="onRestartGame()">🔄</button>
+  </div>
+
+</div>
+
+<!-- ══════════ GAME OVER ══════════ -->
+<div id="screen-gameover" class="screen">
+  <div class="go-wrap">
+    <div style="font-size:3rem">🏆</div>
+    <h1>Game Over</h1>
+    <div class="win-ban A" id="win-ban">Team A Wins!</div>
+    <div class="go-sc">
+      <span class="g-a" id="go-a">0</span>
+      <span class="g-vs">vs</span>
+      <span class="g-b" id="go-b">0</span>
+    </div>
+    <button class="btn btn-gold" style="max-width:220px" onclick="onRestartGame()">Play Again</button>
+  </div>
+</div>
+
+<!-- ══════════ DEALING OVERLAY ══════════ -->
+<div id="deal-ov">
+  <div style="font-size:2.5rem">🃏</div>
+  <div class="do-title" id="do-title">Dealing…</div>
+  <div class="do-sub"   id="do-sub">Shuffling cards</div>
+  <div class="do-row"   id="do-row"></div>
+</div>
+
+<!-- ══════════ OVERLAYS ══════════ -->
+<div class="ov" id="ov-bid">
+  <div class="panel">
+    <h2>Your Bid</h2>
+    <p id="bid-info">Open the bidding!</p>
+    <div class="blog" id="blog"></div>
+    <div class="bid-grid">
+      <button class="bn" id="b7" onclick="placeBid(7)">7</button>
+      <button class="bn" id="b8" onclick="placeBid(8)">8</button>
+      <button class="bn" id="b9" onclick="placeBid(9)">9</button>
+    </div>
+    <button class="bn-nil" id="bnil" onclick="placeBid('nil')">Pass (Nil)</button>
+    <div class="hprev">
+      <div class="hp-lbl">Your Cards</div>
+      <div class="hp-cards" id="hp-cards"></div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="ov-power">
+  <div class="panel">
+    <h2>Select Power Card</h2>
+    <p>Choose one card to place face-down.<br>Its suit becomes Trump when revealed.</p>
+    <div class="pwr-hand" id="pwr-hand"></div>
+  </div>
+</div>
+
+<div class="ov" id="ov-round">
+  <div class="panel">
+    <h2 id="re-title">Round Over</h2>
+    <div class="rmsg" id="re-msg"></div>
+    <div class="pvrev" id="re-pv" style="display:none">
+      <span class="pvl">Trump was:</span>
+      <div id="re-pc"></div>
+    </div>
+    <div class="sgrid">
+      <div class="stile a"><div class="sl">Team A</div>
+        <div class="sv" id="re-ra">+0</div><div class="st" id="re-ta">Total: 0</div></div>
+      <div class="stile b"><div class="sl">Team B</div>
+        <div class="sv" id="re-rb">+0</div><div class="st" id="re-tb">Total: 0</div></div>
+    </div>
+    <div class="rinfo" id="re-ri"></div>
+    <button class="btn btn-green" onclick="onReadyNext()">Ready for Next Round</button>
+  </div>
+</div>
+
+<div id="toasts"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/game.js"></script>
+</body>
+</html>
